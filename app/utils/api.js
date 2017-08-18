@@ -1,5 +1,50 @@
 const axios = require('axios');
 
+function getProfile(username) {
+  return axios.get('https://api.github.com/users/' + username)
+    .then(function (user) {
+      return user.data;
+    })
+}
+function getRepos(username) {
+  return axios.get('https://api.github.com/users/' + username + '/repos');
+}
+function getStarCount(repos) {
+  return repos.data.reduce(function (count, repo) {
+    return count + repo.stargazers_count;
+  }, 0)
+}
+
+function calculateScore(profile, repos) {
+  return profile.followers + (3 * getStarCount(repos))
+}
+
+function getUserData(player) {
+  return axios.all([
+    getProfile(player),
+    getRepos(player)
+  ]).then(function (data) {
+    var profile = data[0];
+    var repos = data[1];
+
+    return {
+      profile: profile,
+      score: calculateScore(profile, repos)
+    }
+  })
+}
+
+function sortPlayers(players) {
+  return players.sort(function (a, b) {
+    return b.score - a.score;
+  })
+}
+
+function handleError(error) {
+  console.warn(error);
+  return null;
+}
+
 module.exports = {
   fetchPopularRepos: function (language) {
     var encodedURI = window.encodeURI('https://api.github.com/search/repositories?q=stars:>1+language:'+ language + '&sort=stars&order=desc&type=Repositories');
@@ -8,5 +53,11 @@ module.exports = {
     .then(function (response) {
       return response.data.items;
     });
+  },
+
+  battle: function (players) {
+    return axios.all(players.map(getUserData))
+      .then(sortPlayers)
+      .catch(handleError)
   }
 };
