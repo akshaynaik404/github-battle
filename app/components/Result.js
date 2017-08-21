@@ -5,6 +5,7 @@ var PropTypes = require('prop-types');
 
 var api = require('../utils/api');
 var PlayerPreview = require('./PlayerPreview');
+var Loading = require('./Loading');
 
 function Profile (props) {
   var info = props.info;
@@ -86,7 +87,7 @@ class Result extends React.Component {
     var error = this.state.error;
     var loading = this.state.loading;
     if(loading === true) {
-      return <p>loading...</p>
+      return <div className='loader'><Loading /></div>
     }
 
     if(error) {

@@ -2,7 +2,7 @@ var React = require('react');
 var PropTypes = require('prop-types');
 
 var api = require('../utils/api');
-
+var Loading = require('./Loading');
 function RepoGrid (props) {
   return (
     <ul className='popular-list'>
@@ -99,7 +99,7 @@ class Popular extends React.Component {
         />
         {
           !this.state.repos
-            ? <div className='loader'>LOADING...</div>
+            ? <div className='loader'><Loading /></div>
             : <RepoGrid repos={this.state.repos} />
         }
       </div>
